@@ -32,6 +32,19 @@ app.get('/bruxos', async (req, res) => {
     }
 });
 
+// pegar varinhas
+app.get('/varinhas', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM varinha');
+        res.json({
+            total: result.rowCount,
+            varinhas: result.rows,
+        });
+    } catch (error) {
+        console.error('Erro ao obter varinhas:', error);
+        res.status(500).send('Erro ao obter varinhas');
+    }
+});
 // criar bruxo
 app.post('/bruxos', async (req, res) => {
     try {
