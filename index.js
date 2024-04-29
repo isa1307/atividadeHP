@@ -12,9 +12,22 @@ const pool = new Pool({
     user: 'postgres',
     host: 'localhost',
     database: 'hp_desafio',
-    password: '1234',
+    password: 'ds564',
     port: 5432,
 });
+
+//validar campos
+
+function validarCampos(body) {
+    const campos = ['nome', 'idade', 'casa', 'habilidade', 'status', 'patrono', 'material', 'comprimento', 'nucleo', 'data_criacao'];
+    for (let campo of campos) {
+        if (!body[campo]) {
+            return campo;
+        }
+    }
+    return null;
+}
+
 
 /* BRUXOS🧙‍♀️ */
 
@@ -36,7 +49,13 @@ app.get('/bruxos', async (req, res) => {
 // criar bruxo
 app.post('/bruxos', async (req, res) => {
     try {
+
         const { nome, idade, casa, habilidade, status, patrono } = req.body;
+        const campoVazio = validarCampos(req.body);
+        if (campoVazio) {
+            return res.status(400).send({ mensagem: `Preencha o campo ${campoVazio}` });
+        }
+
 
         let casaValida = ['grifinoria', 'sonserina', 'corvinal', 'lufa-lufa'];
         let sangueValido = ['puro', 'mestico', 'trouxa'];
@@ -45,7 +64,7 @@ app.post('/bruxos', async (req, res) => {
             return res.status(400).send({ mensagem: 'Casa inválida, escolha entre Grifinória, Sonserina, Corvinal ou Lufa-Lufa' });
         } else if (!sangueValido.includes(status)) {
             return res.status(400).send({ mensagem: 'Status inválido, escolha entre Puro, Mestiço ou Trouxa' });
-        }else{
+        } else {
             res.status(201).send({ mensagem: `Seja bem vindo(a): ${nome}!🧙‍♀️` });
         }
 
@@ -78,10 +97,15 @@ app.delete('/bruxos/:id', async (req, res) => {
 app.put('/bruxos/:id', async (req, res) => {
     try {
         const { id } = req.params;
+        const campoVazio = validarCampos(req.body);
         let { nome, idade, casa, habilidade, status, patrono } = req.body;
 
         let casaValida = ['grifinoria', 'sonserina', 'corvinal', 'lufa-lufa'];
         let sangueValido = ['puro', 'mestico', 'trouxa'];
+
+        if (campoVazio) {
+            return res.status(400).send({ mensagem: `Preencha o campo ${campoVazio}` });
+        }
 
         if (!casaValida.includes(casa)) {
             return res.status(400).send({ mensagem: 'Casa inválida, escolha entre Grifinória, Sonserina, Corvinal ou Lufa-Lufa' });
@@ -117,22 +141,23 @@ app.get('/bruxos/:id', async (req, res) => {
 //pesquisar pelo nome do bruxo
 app.get('/bruxos/nome/:nome', async (req, res) => {
     try {
-        const { nome } = req.query;
-        let result;
-        if (nome) {
-            result = await pool.query('SELECT * FROM bruxos WHERE LOWER(nome) = LOWER($1)', [nome]);
-        } else {
-            result = await pool.query('SELECT * FROM bruxos');
-        }
-        if (result.rowCount == 0) {
+        const { nome } = req.params;
+
+        const result = await pool.query('SELECT * FROM bruxos WHERE nome = $1', [nome]);
+
+        if (result.rowCount === 0) {
             return res.status(404).send({ mensagem: 'Bruxo(a) não encontrado(a)🧙‍♀️' });
+        } else {
+            res.json(result.rows[0]);
+            console.log("results", result.rows);
         }
-        res.json(result.rows);
     } catch (error) {
         console.error('Erro ao obter bruxos:', error);
         res.status(500).send('Erro ao obter bruxos');
     }
 });
+
+
 
 // VARINHAS 🧙‍♂️
 
@@ -140,6 +165,7 @@ app.get('/bruxos/nome/:nome', async (req, res) => {
 app.get('/varinhas', async (req, res) => {
     try {
         const result = await pool.query('SELECT * FROM varinha');
+      
         res.json({
             total: result.rowCount,
             varinhas: result.rows,
@@ -154,6 +180,12 @@ app.get('/varinhas', async (req, res) => {
 app.post('/varinhas', async (req, res) => {
     try {
         const { material, comprimento, nucleo, data_criacao } = req.body;
+        const campoVazio = validarCampos(req.body);
+        
+        if (campoVazio) {
+            return res.status(400).send({ mensagem: `Preencha o campo ${campoVazio}` });
+        }
+
         await pool.query('INSERT INTO varinha (material, comprimento, nucleo, data_criacao) VALUES ($1, $2, $3, $4)',
             [material, comprimento, nucleo, data_criacao]);
         res.status(201).send({ mensagem: 'Varinha adicionada com sucesso!🧙‍♂️' });
@@ -180,6 +212,12 @@ app.put('/varinhas/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const { material, comprimento, nucleo, data_criacao } = req.body;
+        const campoVazio = validarCampos(req.body);
+        
+        if (campoVazio) {
+            return res.status(400).send({ mensagem: `Preencha o campo ${campoVazio}` });
+        }
+        
         await pool.query('UPDATE varinha SET material = $1, comprimento = $2, nucleo = $3,  data_criacao = $4 WHERE id = $5',
             [material, comprimento, nucleo, data_criacao, id]);
         res.send({ mensagem: 'Varinha atualizada com sucesso!🧙‍♂️' });
@@ -204,6 +242,20 @@ app.get('/varinhas/:id', async (req, res) => {
     }
 });
 
+//pesquisar varinha por material
+app.get('/varinhas/material/:material', async (req, res) => {
+    try {
+        const { material } = req.params;
+        const result = await pool.query('SELECT * FROM varinha WHERE material = $1', [material]);
+        if (result.rowCount === 0) {
+            return res.status(404).send({ mensagem: 'Varinha não encontrada🧙‍♂️' });
+        }
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Erro ao obter varinha:', error);
+        res.status(500).send('Erro ao obter varinha');
+    }
+});
 
 
 
