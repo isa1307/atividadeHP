@@ -34,11 +34,11 @@ O servidor será iniciado na porta 5000.
 - GET /bruxos/nome/:nome Retorna o bruxo com o nome pesquisado.
 
 ## Rotas varinhas🔮
-- **GET /varinhas:** Retorna todos os bruxos cadastrados.
-- **GET /varinhas/:id:** Retorna um bruxo específico com base no ID fornecido.
-- **POST /varinhas:** Adiciona um novo bruxo.
-- **PUT /varinhas/:id:** Atualiza as informações de um bruxo existente.
-- **DELETE /varinhas/:id:** Exclui um bruxo com base no ID fornecido.
+- **GET /varinhas:** Retorna todas as varinhas cadastradas.
+- **GET /varinhas/:id:** Retorna uma varinha específica com base no ID fornecido.
+- **POST /varinhas:** Adiciona uma nova varinha.
+- **PUT /varinhas/:id:** Atualiza as informações de um varinha existente.
+- **DELETE /varinhas/:id:** Exclui uma varinha com base no ID fornecido.
 - **GET /varinhas/material/:material** Retorna o material pesquisado que a varinha é feita.
 
 
