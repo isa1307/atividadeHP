@@ -114,6 +114,25 @@ app.get('/bruxos/:id', async (req, res) => {
     }
 });
 
+//pesquisar pelo nome do bruxo
+app.get('/bruxos', async (req, res) => {
+    try {
+        const { nome } = req.query;
+        let result;
+        if (nome) {
+            result = await pool.query('SELECT * FROM bruxos WHERE LOWER(nome) = LOWER($1)', [nome]);
+        } else {
+            result = await pool.query('SELECT * FROM bruxos');
+        }
+        if (result.rowCount == 0) {
+            return res.status(404).send({ mensagem: 'Bruxo(a) não encontrado(a)🧙‍♀️' });
+        }
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Erro ao obter bruxos:', error);
+        res.status(500).send('Erro ao obter bruxos');
+    }
+});
 
 // VARINHAS 🧙‍♂️
 
