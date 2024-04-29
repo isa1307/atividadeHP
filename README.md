@@ -1,4 +1,4 @@
-# API de Gerenciamento de Usuários e Bruxos🧙‍♀️🧹
+# API de Gerenciamento de Varinhas e Bruxos🧙‍♀️🧹
 
 ### Configuração do Ambiente
 
