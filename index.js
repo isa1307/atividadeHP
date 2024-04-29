@@ -115,7 +115,7 @@ app.get('/bruxos/:id', async (req, res) => {
 });
 
 //pesquisar pelo nome do bruxo
-app.get('/bruxos', async (req, res) => {
+app.get('/bruxos/nome/:nome', async (req, res) => {
     try {
         const { nome } = req.query;
         let result;
